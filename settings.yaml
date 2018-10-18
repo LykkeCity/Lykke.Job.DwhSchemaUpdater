@@ -1,0 +1,24 @@
+DwhSchemaUpdaterJob:
+  Db:
+    LogsConnString:
+      settings-key: DwhSchemaUpdaterJob-LogsConnString
+      types:
+        - AzureTableStorage
+    SqlConnString:
+      settings-key: DwhSqlConnString
+  DwhBlobAccountName:
+      settings-key: DwhSchemaUpdaterJob-DwhBlobAccountName
+  DwhBlobAccountKey:
+      settings-key: DwhSchemaUpdaterJob-DwhBlobAccountKey
+SlackNotifications:
+    AzureQueue:
+        ConnectionString:
+            settings-key: SlackNotificationsConnString
+            types:
+                - AzureTableStorage
+        QueueName:
+            settings-key: SlackQueueName
+MonitoringServiceClient:
+    MonitoringServiceUrl:
+        settings-key: MonitoringServiceUrl
+
