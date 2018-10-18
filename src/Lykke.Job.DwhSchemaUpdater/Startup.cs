@@ -12,6 +12,7 @@ using Lykke.Common.Log;
 using Lykke.Job.DwhSchemaUpdater.Settings;
 using Lykke.Job.DwhSchemaUpdater.Modules;
 using Lykke.Logs;
+using Lykke.Logs.Loggers.LykkeSlack;
 using Lykke.Sdk;
 using Lykke.SettingsReader;
 using Lykke.MonitoringServiceApiCaller;
@@ -20,6 +21,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Converters;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Lykke.Job.DwhSchemaUpdater
 {
@@ -79,7 +81,16 @@ namespace Lykke.Job.DwhSchemaUpdater
                     settingsManager.ConnectionString(s => s.DwhSchemaUpdaterJob.Db.LogsConnString),
                     "DwhSchemaUpdaterJobLog",
                     appSettings.SlackNotifications.AzureQueue.ConnectionString,
-                    appSettings.SlackNotifications.AzureQueue.QueueName);
+                    appSettings.SlackNotifications.AzureQueue.QueueName,
+                    logging =>
+                    {
+                        logging.AddAdditionalSlackChannel("Bridges", options =>
+                        {
+                            options.MinLogLevel = LogLevel.Warning;
+                            options.SpamGuard.DisableGuarding();
+                            options.IncludeHealthNotifications();
+                        });
+                    });
 
                 var builder = new ContainerBuilder();
                 builder.Populate(services);
