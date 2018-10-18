@@ -36,7 +36,6 @@ namespace Lykke.Job.DwhSchemaUpdater.Modules
 
             builder.RegisterType<DwhStructureUpdater>()
                 .As<IDwhStructureUpdater>()
-                .AutoActivate()
                 .SingleInstance()
                 .WithParameter("sqlConnString", _settings.Db.SqlConnString)
                 .WithParameter("accountName", _settings.DwhBlobAccountName)

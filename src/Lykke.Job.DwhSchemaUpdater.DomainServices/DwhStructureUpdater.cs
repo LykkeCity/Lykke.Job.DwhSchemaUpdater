@@ -4,6 +4,8 @@ using System.Data.SqlClient;
 using System.Text;
 using System.Threading.Tasks;
 using Common;
+using Common.Log;
+using Lykke.Common.Log;
 using Lykke.Job.DwhSchemaUpdater.Domain;
 using Lykke.Job.DwhSchemaUpdater.Domain.Services;
 using Microsoft.WindowsAzure.Storage;
@@ -22,6 +24,7 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
         private readonly string _sqlConnString;
         private readonly string _accountName;
         private readonly string _accountKey;
+        private readonly ILog _log;
         private readonly CloudBlobClient _blobClient;
         private readonly BlobRequestOptions _blobRequestOptions = new BlobRequestOptions
         {
@@ -31,10 +34,12 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
         };
 
         public DwhStructureUpdater(
+            ILogFactory logFactory,
             string sqlConnString,
             string accountName,
             string accountKey)
         {
+            _log = logFactory.CreateLog(this);
             _sqlConnString = sqlConnString;
             _accountName = accountName;
             _accountKey = accountKey;
@@ -58,6 +63,8 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
                 if (token == null)
                     break;
             }
+
+            _log.Info("Dwh structure update is finished");
         }
 
         private async Task ProcessContainerAsync(CloudBlobContainer container)
