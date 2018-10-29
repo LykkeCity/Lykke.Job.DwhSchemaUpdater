@@ -5,7 +5,7 @@ DwhSchemaUpdaterJob:
       types:
         - AzureTableStorage
     SqlConnString:
-      settings-key: DWHSqlConnString
+      settings-key: DwhSchemaUpdaterJob-SqlConnString
   DwhBlobAccountName:
       settings-key: DwhSchemaUpdaterJob-DwhBlobAccountName
   DwhBlobAccountKey:
