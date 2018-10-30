@@ -33,11 +33,14 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
             ServerTimeout = TimeSpan.FromMinutes(60)
         };
 
+        private bool _forcedUpdate;
+
         public DwhStructureUpdater(
             ILogFactory logFactory,
             string sqlConnString,
             string accountName,
-            string accountKey)
+            string accountKey,
+            bool forcedUpdate = false)
         {
             _log = logFactory.CreateLog(this);
             _sqlConnString = sqlConnString;
@@ -45,6 +48,8 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
             _accountKey = accountKey;
             var account = new CloudStorageAccount(new StorageCredentials(_accountName, _accountKey), true);
             _blobClient = account.CreateCloudBlobClient();
+
+            _forcedUpdate = forcedUpdate;
         }
 
         public async Task UpdateDwhSchemaAsync()
@@ -64,6 +69,9 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
                     break;
             }
 
+            if (_forcedUpdate)
+                _forcedUpdate = false;
+
             _log.Info("Dwh structure update is finished");
         }
 
@@ -76,7 +84,7 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
                 return;
 
             bool updateRequired = await CheckUpdateRequiredAsync(container);
-            if (!updateRequired)
+            if (!_forcedUpdate && !updateRequired)
                 return;
 
             var columnsListDict = GetColumnsListsFromStructure(tablesStructure);
@@ -170,7 +178,7 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
                         strBuilder.Append("DATETIME");
                     else if (columnInfo.ColumnType == typeof(double).Name ||
                              columnInfo.ColumnType == typeof(decimal).Name)
-                        strBuilder.Append("Decimal");
+                        strBuilder.Append("Decimal(18,8)");
                     else if (columnInfo.ColumnType == typeof(bool).Name)
                         strBuilder.Append("Bit");
                     else

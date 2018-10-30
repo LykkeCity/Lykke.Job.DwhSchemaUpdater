@@ -39,7 +39,8 @@ namespace Lykke.Job.DwhSchemaUpdater.Modules
                 .SingleInstance()
                 .WithParameter("sqlConnString", _settings.Db.SqlConnString)
                 .WithParameter("accountName", _settings.DwhBlobAccountName)
-                .WithParameter("accountKey", _settings.DwhBlobAccountKey);
+                .WithParameter("accountKey", _settings.DwhBlobAccountKey)
+                .WithParameter("forcedUpdate", _settings.ForcedUpdate ?? false);
 
             builder.RegisterType<PeriodicalHandler>()
                 .As<IStartable>()
