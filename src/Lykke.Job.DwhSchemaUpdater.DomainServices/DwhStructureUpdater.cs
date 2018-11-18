@@ -77,7 +77,7 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
 
         private async Task ProcessContainerAsync(CloudBlobContainer container)
         {
-            Console.WriteLine($"Processing container - {container.Name}");
+            _log.Info($"Processing container - {container.Name}");
 
             var tablesStructure = await GetStructureFromContainerAsync(container);
             if (tablesStructure == null)
@@ -90,7 +90,7 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
             var columnsListDict = GetColumnsListsFromStructure(tablesStructure);
             foreach (var tableStructure in tablesStructure.Tables)
             {
-                Console.WriteLine($"\tSetting schema for table {tableStructure.TableName}");
+                _log.Info($"\tSetting schema for table {tableStructure.TableName}");
 
                 var sql = GenerateSqlCommand(
                     tableStructure.TableName,
@@ -115,7 +115,10 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
                         Console.WriteLine(e);
                         ++retryCount;
                         if (retryCount > _maxRetryCount)
-                            throw;
+                        {
+                            _log.Error(e, context: container.Name);
+                            break;
+                        }
 
                         await Task.Delay(TimeSpan.FromSeconds(retryCount));
                     }
