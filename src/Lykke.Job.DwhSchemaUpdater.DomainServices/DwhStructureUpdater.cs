@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Common;
@@ -90,6 +91,17 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
             var columnsListDict = GetColumnsListsFromStructure(tablesStructure);
             foreach (var tableStructure in tablesStructure.Tables)
             {
+                var blobsResult = await container.ListBlobsSegmentedAsync(
+                    tableStructure.AzureBlobFolder,
+                    true,
+                    BlobListingDetails.None,
+                    1,
+                    null,
+                    null,
+                    null);
+                if (!blobsResult.Results.Any())
+                    continue;
+
                 _log.Info($"\tSetting schema for table {tableStructure.TableName}");
 
                 var sql = GenerateSqlCommand(
