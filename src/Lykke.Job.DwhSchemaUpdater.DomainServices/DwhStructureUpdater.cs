@@ -88,6 +88,7 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
             if (!_forcedUpdate && !updateRequired)
                 return;
 
+            bool updated = false;
             var columnsListDict = GetColumnsListsFromStructure(tablesStructure);
             foreach (var tableStructure in tablesStructure.Tables)
             {
@@ -119,6 +120,7 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
                             await connection.OpenAsync();
                             SqlCommand command = new SqlCommand(sql, connection);
                             await command.ExecuteNonQueryAsync();
+                            updated = true;
                         }
                         break;
                     }
@@ -137,8 +139,11 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
                 }
             }
 
-            var updateBlob = container.GetBlockBlobReference(_structureUpdateFileName);
-            await updateBlob.UploadTextAsync(string.Empty);
+            if (updated)
+            {
+                var updateBlob = container.GetBlockBlobReference(_structureUpdateFileName);
+                await updateBlob.UploadTextAsync(string.Empty);
+            }
         }
 
         private async Task<bool> CheckUpdateRequiredAsync(CloudBlobContainer container)
