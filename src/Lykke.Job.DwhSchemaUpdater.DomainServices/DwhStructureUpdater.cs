@@ -88,7 +88,7 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
             if (!_forcedUpdate && !updateRequired)
                 return;
 
-            bool updated = false;
+            bool updated = true;
             var columnsListDict = GetColumnsListsFromStructure(tablesStructure);
             foreach (var tableStructure in tablesStructure.Tables)
             {
@@ -120,7 +120,6 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
                             await connection.OpenAsync();
                             SqlCommand command = new SqlCommand(sql, connection);
                             await command.ExecuteNonQueryAsync();
-                            updated = true;
                         }
                         break;
                     }
@@ -131,6 +130,7 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
                         if (retryCount > _maxRetryCount)
                         {
                             _log.Error(e, context: container.Name);
+                            updated = false;
                             break;
                         }
 
