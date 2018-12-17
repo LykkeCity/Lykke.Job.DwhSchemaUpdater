@@ -198,7 +198,7 @@ namespace Lykke.Job.DwhSchemaUpdater.DomainServices
                         strBuilder.Append("DATETIME");
                     else if (columnInfo.ColumnType == typeof(double).Name ||
                              columnInfo.ColumnType == typeof(decimal).Name)
-                        strBuilder.Append("Decimal(23,8)");
+                        strBuilder.Append("Decimal(30,14)");
                     else if (columnInfo.ColumnType == typeof(bool).Name)
                         strBuilder.Append("Bit");
                     else
